@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 
 const links = [
@@ -11,98 +11,84 @@ const links = [
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
+
   const desktopClass = ({ isActive }) =>
     `rounded-lg px-3.5 py-2 text-sm font-medium transition-colors no-underline ${
       isActive
-        ? "bg-indigo-500/15 text-indigo-400"
-        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+        ? "bg-indigo-50 text-indigo-700"
+        : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
     }`;
 
   const mobileClass = ({ isActive }) =>
     `rounded-xl px-4 py-3 text-base font-medium transition-colors no-underline ${
       isActive
-        ? "bg-indigo-500/15 text-indigo-400"
-        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+        ? "bg-indigo-50 text-indigo-700"
+        : "text-stone-700 hover:bg-stone-100 hover:text-stone-900"
     }`;
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-800/80 bg-slate-950/95 backdrop-blur-xl">
-      <nav
-        className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
-        aria-label="Main navigation"
-      >
-     
+    <header className="sticky top-0 z-50 w-full border-b border-stone-200/80 bg-stone-50/85 backdrop-blur-lg">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-8">
           <Link
             to="/"
-            className="flex items-center gap-2.5 rounded-lg no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+            className="flex items-center gap-2 rounded-lg no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
           >
-           
-
-            <span className="text-lg font-semibold no-underline tracking-tight text-white">
-              TrackEd
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-700 text-sm font-bold text-white shadow-sm">
+              L
+            </div>
+            <span className="text-lg font-bold tracking-tight text-stone-900">
+             Track<span className="text-indigo-700">Ed</span>
             </span>
           </Link>
 
-          <ul className="hidden items-center gap-1 lg:flex">
-            {links.map((link) => (
-              <li key={link.to}>
-                <NavLink to={link.to} end className={desktopClass}>
-                  {link.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+          <nav className="hidden lg:block" aria-label="Main navigation">
+            <ul className="flex items-center gap-1">
+              {links.map((link) => (
+                <li key={link.to}>
+                  <NavLink to={link.to} end className={desktopClass}>
+                    {link.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
-        {/* Right Side */}
-        <div className="flex items-center gap-3">
-          {/* Search */}
-          <div className="relative hidden md:block">
-            <svg
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
-              />
-            </svg>
-
-            <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
-              ⌘K
-            </kbd>
-          </div>
-
-          {/* Divider */}
-          <div className="hidden h-6 w-px bg-slate-800 sm:block" />
-
-          {/* Login */}
+        <div className="flex items-center gap-2">
           <Link
             to="/login"
-            className="hidden rounded-lg px-3.5 py-2 text-sm font-medium text-slate-300 no-underline transition-colors hover:bg-slate-800 hover:text-white lg:inline-flex"
+            className="hidden rounded-lg px-3.5 py-2 text-sm font-medium text-stone-700 no-underline transition-colors hover:bg-stone-100 hover:text-indigo-700 lg:inline-flex"
           >
             Login
           </Link>
 
           <Link
             to="/register"
-            className="hidden items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 px-4 py-2 text-sm font-semibold text-white no-underline shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/30 lg:inline-flex"
+            className="hidden items-center justify-center rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white no-underline shadow-sm transition hover:bg-indigo-800 lg:inline-flex"
           >
             Sign up
           </Link>
 
-          {/* Mobile Menu */}
           <button
             type="button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="inline-flex rounded-lg p-2 text-slate-300 transition-colors hover:bg-slate-800 hover:text-white lg:hidden"
+            onClick={() => setMenuOpen((open) => !open)}
+            className="inline-flex rounded-lg p-2 text-stone-700 transition-colors hover:bg-stone-100 lg:hidden"
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
           >
             <svg
               className="h-6 w-6"
@@ -110,6 +96,7 @@ function Navbar() {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth="2"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -123,31 +110,44 @@ function Navbar() {
             </svg>
           </button>
         </div>
-      </nav>
+      </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile menu */}
       {menuOpen && (
-        <div className="border-t border-slate-800 bg-slate-950 p-4 lg:hidden">
-          <nav className="flex flex-col gap-1">
+        <div
+          id="mobile-menu"
+          className="border-t border-stone-200 bg-stone-50 p-4 lg:hidden"
+        >
+          <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 end
                 className={mobileClass}
-                onClick={() => setMenuOpen(false)}
+                onClick={closeMenu}
               >
                 {link.mobile}
               </NavLink>
             ))}
 
-            <Link
-              to="/login"
-              className="mt-2 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 px-4 py-3 text-center text-base font-semibold text-white no-underline shadow-lg shadow-indigo-500/20"
-              onClick={() => setMenuOpen(false)}
-            >
-              Login
-            </Link>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Link
+                to="/login"
+                onClick={closeMenu}
+                className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-center text-base font-semibold text-stone-700 no-underline transition hover:bg-stone-100"
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                onClick={closeMenu}
+                className="rounded-xl bg-indigo-700 px-4 py-3 text-center text-base font-semibold text-white no-underline shadow-sm transition hover:bg-indigo-800"
+              >
+                Sign up
+              </Link>
+            </div>
           </nav>
         </div>
       )}
